@@ -81,7 +81,10 @@ app.post("/signin", async (req, res) => {
     return;
   }
 
-  req.session.user = user;
+  const userSession = { ...user };
+  delete userSession._id;
+
+  req.session.user = userSession;
 
   res.json({
     success: true,
@@ -98,23 +101,53 @@ app.get("/dashboard", (req, res) => {
   res.sendFile(__dirname + "/html/dashboard.html");
 });
 
-// app.get("/user", async (req, res) => {
-//   if (!req.session.user) {
-//     res.status(401).json({ success: false, message: "Not authenticated" });
-//     return;
-//   }
+app.get("/viewprofile", (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+    return;
+  }
+  res.sendFile(__dirname + "/html/viewprofile.html");
+});
 
-//   const user = await db
-//     .collection("users")
-//     .findOne({ _id: new MongoClient.ObjectID(req.session.user._id) });
-//   if (!user) {
-//     res.status(404).json({ success: false, message: "User not found" });
-//     return;
-//   }
-//   delete user.password;
-//   res.json({ success: true, user });
-// });
+app.get("/api/user", async (req, res) => {
+  if (!req.session.user) {
+    res.status(401).json({ message: "Not authenticated" });
+    return;
+  }
 
-app.listen(3000, () => {
+  const user = await db
+    .collection("users")
+    .findOne({ email: req.session.user.email });
+  if (!user) {
+    res.status(404).json({ message: "User not found" });
+    return;
+  }
+
+  res.json(user);
+});
+
+app.put("/api/user", async (req, res) => {
+  if (!req.session.user) {
+    res.status(401).json({ message: "Not authenticated" });
+    return;
+  }
+
+  const updateFields = {};
+  for (let key in req.body) {
+    updateFields[key] = req.body[key];
+  }
+
+  const updateResult = await db
+    .collection("users")
+    .updateOne({ email: req.session.user.email }, { $set: updateFields });
+
+  if (updateResult.modifiedCount === 1) {
+    res.json({ success: true, message: "User updated successfully" });
+  } else {
+    res.status(500).json({ message: "Error updating user" });
+  }
+});
+
+app.listen(3001, () => {
   console.log("Server is running at port 3000");
 });
