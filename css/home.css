@@ -135,7 +135,7 @@ body::before {
     padding: 20px 20px;
     position: fixed;
     top: 0;
-    width: 97.5%;
+    width: 100%;
     z-index: 1000;
 }
 
@@ -144,6 +144,7 @@ body::before {
     color: #FF6347;
     font-size: 24px;
     transition: color 0.3s ease;
+    margin-left: 20px;
 }
 
 .logo:hover {

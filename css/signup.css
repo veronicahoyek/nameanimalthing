@@ -124,7 +124,7 @@ a:hover {
     padding: 20px 20px;
     position: fixed;
     top: 0;
-    width: 97.5%;
+    width: 100%;
     z-index: 1000;
 }
 
@@ -160,4 +160,11 @@ a:hover {
 
 .nav-links a:hover {
     color: #FF6347;
+}
+
+#error-message {
+    color: blue;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 10px;
 }
