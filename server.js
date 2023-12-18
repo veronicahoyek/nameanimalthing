@@ -232,6 +232,8 @@ app.post("/creategame", async (req, res) => {
     createdAt: new Date(),
   };
 
+  console.log(game);
+
   const result = await db.collection("games").insertOne(game);
 
   if (result.acknowledged) {
@@ -239,6 +241,7 @@ app.post("/creategame", async (req, res) => {
       success: true,
       message: "Game created successfully",
       roomCode,
+      redirect: `/waitingroom?roomCode=${roomCode}`,
     });
   } else {
     res.json({ success: false, message: "Error creating game" });
@@ -282,10 +285,31 @@ app.post("/joinroom", async (req, res) => {
     res.json({
       success: true,
       message: "Joined room successfully",
+      redirect: `/waitingroom?roomCode=${roomCode}`,
     });
   } else {
     res.json({ success: false, message: "Error joining room" });
   }
+});
+
+app.get("/waitingroom", (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+    return;
+  }
+  res.sendFile(__dirname + "/html/waitingroom.html");
+});
+
+app.get("/api/waitingroom", async (req, res) => {
+  const { roomCode } = req.query;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.status(404).json({ message: "Room not found" });
+    return;
+  }
+
+  res.json(game);
 });
 
 app.listen(3001, () => {

@@ -22,7 +22,7 @@ document
     const data = await response.json();
 
     if (data.success) {
-      alert("Game created successfully. Room code: " + data.roomCode);
+      window.location.href = data.redirect;
     } else {
       alert("Error creating game: " + data.message);
     }

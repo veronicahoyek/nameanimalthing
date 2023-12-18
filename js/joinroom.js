@@ -19,6 +19,7 @@ document
     if (data.success) {
       console.log("Joined room successfully");
       errorMessageDiv.textContent = "";
+      window.location.href = data.redirect;
     } else {
       if (data.message === "Game has already started") {
         errorMessageDiv.textContent =

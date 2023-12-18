@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <title>Waiting Room</title>
     <link rel="stylesheet" href="../css/waitingroom.css">
-    <!-- Include other stylesheets or libraries if needed -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body style="background-image: url('../ressources/background.jpg'); background-size: cover; background-position: center;">
-    <!-- Navigation -->
     <nav class="navbar">
         <a href="dashboard.html" class="logo">Name, Animal, Thing</a>
         <ul class="nav-links">
@@ -19,46 +17,15 @@
         </ul>
     </nav>
 
-    <!-- Waiting Room Content -->
     <div class="background-overlay">
         <div class="waiting-room-container">
-            <h2>Room #12345</h2>
+            <h2 id="room-number"></h2>
             <div class="user-grid">
-                <div class="user-avatar">
-                    <img src="../ressources/pfp.png" alt="User Avatar 1">
-                    <p>antoinetawil</p>
-                </div>
-                <div class="user-avatar">
-                    <img src="../ressources/pfp.png" alt="User Avatar 2">
-                    <p>eliemeshraad</p>
-                </div>
-            </div>
-            <div class="user-grid">
-                <div class="user-avatar">
-                    <img src="../ressources/pfp.png" alt="User Avatar 3">
-                    <p>veronicahoyek</p>
-                </div>
-                <div class="user-avatar">
-                    <img src="../ressources/pfp.png" alt="User Avatar 4">
-                    <p>georgesaboudaher</p>
-                </div>
-            </div>
-            <div class="user-grid">
-                <div class="user-avatar">
-                    <img src="../ressources/pfp.png" alt="User Avatar 5">
-                    <p>kevinghaoui</p>
-                </div>
-                <div class="user-avatar">
-                    <img src="../ressources/pfp.png" alt="User Avatar 6">
-                    <p>farahezzedine</p>
-                </div>
             </div>
             <button class="button">Start game</button>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <!-- Include any necessary scripts here -->
-
+    <script src="../js/waitingroom.js"></script>
 </body>
 </html>
