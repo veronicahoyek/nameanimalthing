@@ -1,13 +1,32 @@
-window.addEventListener("load", async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const roomCode = urlParams.get("roomCode");
+const socket = io();
+const urlParams = new URLSearchParams(window.location.search);
+const roomCode = urlParams.get("roomCode");
 
+socket.emit("joinRoom", roomCode);
+
+socket.on("playerJoined", (player) => {
+  const userAvatarDiv = document.createElement("div");
+  userAvatarDiv.className = "user-avatar";
+
+  const img = document.createElement("img");
+  img.src = "../ressources/pfp.png";
+  img.alt = `User Avatar ${player.username}`;
+
+  const p = document.createElement("p");
+  p.textContent = player.username;
+
+  userAvatarDiv.appendChild(img);
+  userAvatarDiv.appendChild(p);
+
+  document.querySelector(".user-grid").appendChild(userAvatarDiv);
+});
+
+window.addEventListener("load", async () => {
   const response = await fetch(`/api/waitingroom?roomCode=${roomCode}`);
   const data = await response.json();
 
   console.log(data);
   document.querySelector("h2").textContent = `Room #${data.game.roomCode}`;
-
   data.game.players.forEach((player) => {
     const userAvatarDiv = document.createElement("div");
     userAvatarDiv.className = "user-avatar";
