@@ -389,6 +389,19 @@ app.post("/api/startgame", async (req, res) => {
   }
 });
 
+app.get("/signout", (req, res) => {
+  console.log(req.session);
+  req.session.destroy((err) => {
+    if (err) {
+      // Handle the error case
+      res.status(500).send("Could not sign out. Please try again.");
+    } else {
+      res.redirect("/home");
+      console.log(req.session); // Redirect to home page after signing out
+    }
+  });
+});
+
 server.listen(3001, () => {
   console.log("Server is running at port 3001");
 });
