@@ -317,6 +317,78 @@ app.get("/api/waitingroom", async (req, res) => {
 app.get("/howtoplay", (req, res) => {
   res.sendFile(__dirname + "/html/howtoplay.html");
 });
-app.listen(3001, () => {
+
+const alphabet = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+];
+
+app.post("/api/startgame", async (req, res) => {
+  const { roomCode } = req.body;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.json({ success: false, message: "Game does not exist" });
+    return;
+  }
+
+  if (game.status !== "waiting") {
+    res.json({ success: false, message: "Game has already started" });
+    return;
+  }
+
+  const letter = alphabet[Math.floor(Math.random() * alphabet.length)];
+
+  const round = {
+    roundNumber: game.currentRound + 1,
+    letter,
+    status: "active",
+    playerResponses: [],
+  };
+
+  const result = await db.collection("games").updateOne(
+    { roomCode },
+    {
+      $set: { status: "active", currentRound: round.roundNumber },
+      $push: { rounds: round },
+    }
+  );
+
+  if (result.modifiedCount === 1) {
+    io.to(roomCode).emit("gameStarted", {
+      letter,
+      categories: game.categories,
+    });
+    res.json({ success: true });
+  } else {
+    res.json({ success: false, message: "Error starting game" });
+  }
+});
+
+server.listen(3001, () => {
   console.log("Server is running at port 3001");
 });

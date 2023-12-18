@@ -22,9 +22,10 @@
     <!-- Game Content -->
     <div class="background-overlay">
         <div class="game-container">
-            <h2>Game Room</h2>
+            <h2 id="roomCode">Game Room</h2>
+            <h3 id="letter"></h3>
             <div class="categories-container" id="categoriesContainer">
-                <!-- The selected categories will be displayed here -->
+                <div id="categories"></div>
             </div>
             <!-- Submit Button -->
             <form id="gameForm">
@@ -35,9 +36,8 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="../js/game.js"></script>
-    <!-- Include other scripts if needed -->
 
 </body>
 </html>

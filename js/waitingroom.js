@@ -50,3 +50,29 @@ window.addEventListener("load", async () => {
     }
   });
 });
+
+document.querySelector(".button").addEventListener("click", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomCode = urlParams.get("roomCode");
+
+  fetch("/api/startgame", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ roomCode }),
+    credentials: "include",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        window.location.href = `/game.html?roomCode=${roomCode}`;
+      } else {
+        console.error("Failed to start game");
+      }
+    });
+});
+
+socket.on("gameStarted", () => {
+  window.location.href = `/game.html?roomCode=${roomCode}`;
+});
