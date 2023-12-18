@@ -20,21 +20,21 @@ app.use("/js", express.static(path.join(__dirname, "js")));
 app.use("/css", express.static(path.join(__dirname, "css")));
 app.use("/ressources", express.static(path.join(__dirname, "ressources")));
 
+app.use(
+  session({
+    secret: "your secret key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
+
 const uri =
   "mongodb+srv://admin:admin@nameanimalthing.rhe4bnc.mongodb.net/?retryWrites=true&w=majority";
 
 const client = new MongoClient(uri);
 
 db = client.db("nameanimalthing");
-
-app.use(
-  session({
-    secret: "sha256",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
-  })
-);
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/html/index.html");
@@ -87,7 +87,6 @@ app.post("/signin", async (req, res) => {
   }
 
   const userSession = { ...user };
-  delete userSession._id;
 
   req.session.user = userSession;
 
@@ -203,6 +202,49 @@ app.put("/api/user", async (req, res) => {
   }
 });
 
+app.get("/creategame", (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  res.sendFile(__dirname + "/html/creategame.html");
+});
+
+app.post("/creategame", async (req, res) => {
+  const { categories, totalRounds } = req.body;
+
+  const creator = {
+    _id: req.session.user._id,
+    username: req.session.user.username,
+  };
+
+  const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  const game = {
+    roomCode,
+    categories,
+    totalRounds,
+    currentRound: 0,
+    players: [{ ...creator, score: 0 }],
+    rounds: [],
+    status: "waiting",
+    createdAt: new Date(),
+  };
+
+  const result = await db.collection("games").insertOne(game);
+
+  if (result.acknowledged) {
+    res.json({
+      success: true,
+      message: "Game created successfully",
+      roomCode,
+    });
+  } else {
+    res.json({ success: false, message: "Error creating game" });
+  }
+});
+
 app.listen(3001, () => {
-  console.log("Server is running at port 3001");
+  console.log("Server is running at port 3001");
 });
