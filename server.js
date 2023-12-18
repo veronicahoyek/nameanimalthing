@@ -245,6 +245,49 @@ app.post("/creategame", async (req, res) => {
   }
 });
 
+app.get("/joinroom", (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+    return;
+  }
+  res.sendFile(__dirname + "/html/joinroom.html");
+});
+
+app.post("/joinroom", async (req, res) => {
+  console.log(req.session.user);
+  const { roomCode } = req.body;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.json({ success: false, message: "Room does not exist" });
+    return;
+  }
+
+  if (game.status !== "waiting") {
+    res.json({ success: false, message: "Game has already started" });
+    return;
+  }
+
+  const player = {
+    _id: req.session.user._id,
+    username: req.session.user.username,
+    score: 0,
+  };
+
+  const result = await db
+    .collection("games")
+    .updateOne({ roomCode }, { $push: { players: player } });
+
+  if (result.modifiedCount === 1) {
+    res.json({
+      success: true,
+      message: "Joined room successfully",
+    });
+  } else {
+    res.json({ success: false, message: "Error joining room" });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is running at port 3001");
 });
