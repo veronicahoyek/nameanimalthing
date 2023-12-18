@@ -131,6 +131,39 @@ app.get("/api/user", async (req, res) => {
   res.json(user);
 });
 
+// Endpoint to handle contact form submission
+app.post("/contact", async (req, res) => {
+  const { name, email, message } = req.body;
+
+  try {
+    // Assuming you have a collection named "contactMessages"
+    const result = await db.collection("contactMessages").insertOne({
+      name,
+      email,
+      message,
+    });
+
+    if (result.acknowledged) {
+      res.json({
+        success: true,
+        message: "Message sent successfully",
+        redirect: "/dashboard",
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "Failed to send message",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+});
+
+
 app.put("/api/user", async (req, res) => {
   if (!req.session.user) {
     res.status(401).json({ message: "Not authenticated" });
