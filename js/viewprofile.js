@@ -59,7 +59,7 @@ document.querySelectorAll(".edit-button").forEach((button) => {
             if (data.success) {
               alert(data.message);
             } else {
-              console.error("Error:", data.message);
+              alert("Error: " + data.message);
             }
           })
           .catch((error) => console.error("Error:", error));

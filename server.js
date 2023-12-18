@@ -203,52 +203,6 @@ app.put("/api/user", async (req, res) => {
   }
 });
 
-let games = {}; // Temporary storage for games. Replace with actual database.
-
-io.on("connection", (socket) => {
-  console.log("New client connected");
-
-  socket.on("create", (data, callback) => {
-    // Generate a unique game code
-    const gameCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-
-    // Store the game data along with the game code and creator's socket ID
-    games[gameCode] = {
-      ...data,
-      code: gameCode,
-      creator: socket.id,
-      player: null,
-      active: false,
-    };
-
-    console.log("Game created:", games[gameCode]);
-
-    // Send the game code back to the client
-    callback({ success: true, code: gameCode });
-  });
-
-  socket.on("join", (gameCode, callback) => {
-    const game = games[gameCode];
-
-    if (game && !game.active) {
-      // If the game exists and is not active, add the player to the game
-      game.player = socket.id;
-      game.active = true;
-
-      // Notify both players that the game has started
-      io.to(game.creator).emit("gameStarted", game);
-      io.to(game.player).emit("gameStarted", game);
-
-      callback({ success: true });
-    } else {
-      // If the game does not exist or is already active, send an error
-      callback({ error: "Invalid game code or game already started" });
-    }
-  });
-
-  // ... rest of your code ...
-});
-
-server.listen(3001, () => {
+app.listen(3001, () => {
   console.log("Server is running at port 3001");
 });
