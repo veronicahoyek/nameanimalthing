@@ -11,12 +11,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-io.on("connection", (socket) => {
-  socket.on("joinRoom", (roomCode) => {
-    socket.join(roomCode);
-  });
-});
-
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -288,7 +282,6 @@ app.post("/joinroom", async (req, res) => {
     .updateOne({ roomCode }, { $push: { players: player } });
 
   if (result.modifiedCount === 1) {
-    io.to(roomCode).emit("playerJoined", player);
     res.json({
       success: true,
       message: "Joined room successfully",
@@ -316,8 +309,7 @@ app.get("/api/waitingroom", async (req, res) => {
     return;
   }
 
-  const isCreator =
-    req.session.user._id.toString() === game.players[0]._id.toString();
+  const isCreator = req.session.user._id.toString() === game.players[0]._id.toString();
 
   res.json({ game, isCreator });
 });
@@ -325,7 +317,6 @@ app.get("/api/waitingroom", async (req, res) => {
 app.get("/howtoplay", (req, res) => {
   res.sendFile(__dirname + "/html/howtoplay.html");
 });
-
-server.listen(3001, () => {
+app.listen(3001, () => {
   console.log("Server is running at port 3001");
 });
