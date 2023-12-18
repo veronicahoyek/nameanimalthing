@@ -317,7 +317,6 @@ app.get("/api/waitingroom", async (req, res) => {
 app.get("/howtoplay", (req, res) => {
   res.sendFile(__dirname + "/html/howtoplay.html");
 });
-
 app.listen(3001, () => {
   console.log("Server is running at port 3001");
 });

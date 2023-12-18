@@ -6,9 +6,9 @@ window.addEventListener("load", async () => {
   const data = await response.json();
 
   console.log(data);
-  document.querySelector("h2").textContent = `Room #${data.roomCode}`;
+  document.querySelector("h2").textContent = `Room #${data.game.roomCode}`;
 
-  data.players.forEach((player) => {
+  data.game.players.forEach((player) => {
     const userAvatarDiv = document.createElement("div");
     userAvatarDiv.className = "user-avatar";
 
