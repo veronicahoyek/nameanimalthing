@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Game Room</title>
+    <title>Game</title>
     <link rel="stylesheet" href="../css/game.css">
+    <!-- Include other stylesheets or libraries if needed -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body style="background-image: url('../ressources/background.jpg'); background-size: cover; background-position: center;">
+    <!-- Navigation -->
     <nav class="navbar">
         <a href="dashboard.html" class="logo">Name, Animal, Thing</a>
         <ul class="nav-links">
@@ -16,17 +18,26 @@
             <li><a href="index.html">Log Out</a></li>
         </ul>
     </nav>
+
+    <!-- Game Content -->
     <div class="background-overlay">
-        <div class="game-room-container">
+        <div class="game-container">
             <h2>Game Room</h2>
-            <div class="game-info">
-                <p>Room Code: <span id="room-code"></span></p>
-                <p>Categories:</p>
-                <div id="category-fields"></div>
-                <button id="submit-answer" class="button" disabled>Submit Answer</button>
+            <div class="categories-container" id="categoriesContainer">
+                <!-- The selected categories will be displayed here -->
             </div>
+            <!-- Submit Button -->
+            <form id="gameForm">
+                <div class="form-group">
+                    <button type="submit" class="button">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
+
+    <!-- Scripts -->
     <script src="../js/game.js"></script>
+    <!-- Include other scripts if needed -->
+
 </body>
 </html>

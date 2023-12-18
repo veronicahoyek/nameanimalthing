@@ -1,25 +1,15 @@
-const socket = io();
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const categories = urlParams.get("categories");
+    const categoriesContainer = document.querySelector(".categories-container");
 
-socket.on("gameCreated", (gameData) => {
-    const { code, categories } = gameData;
-
-    // Display room code
-    document.getElementById("room-code").innerText = code;
-
-    // Display categories with input fields
-    const categoryFields = document.getElementById("category-fields");
-    categories.forEach((category) => {
-        const label = document.createElement("label");
-        label.innerText = category;
-        const input = document.createElement("input");
-        input.setAttribute("type", "text");
-        input.setAttribute("name", category.toLowerCase()); // Use category name as input name/id
-        input.setAttribute("placeholder", `Enter ${category}`);
-        label.appendChild(input);
-        categoryFields.appendChild(label);
-    });
-
-    // Enable submit button (if needed)
-    const submitButton = document.getElementById("submit-answer");
-    submitButton.removeAttribute("disabled");
+    if (categories) {
+        const categoriesArray = categories.split(",");
+        categoriesArray.forEach((category) => {
+            const categoryField = document.createElement("input");
+            categoryField.setAttribute("type", "text");
+            categoryField.setAttribute("placeholder", category);
+            categoriesContainer.appendChild(categoryField);
+        });
+    }
 });

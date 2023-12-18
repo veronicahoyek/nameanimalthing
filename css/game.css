@@ -1,0 +1,145 @@
+/* Reset and basic styles */
+@font-face {
+    font-family: 'SunnySpells-Regular';
+    src: url('../ressources/sunny-spells-font/SunnyspellsRegular-MV9ze.otf') format('opentype'); 
+}
+
+body {
+    font-family: 'SunnySpells-Regular', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Background overlay */
+.background-overlay {
+    position: relative;
+}
+
+/* Game container */
+.game-container {
+    background-color: rgba(255, 99, 71, 0.8);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 600px;
+    margin: auto;
+    color: #fff;
+    max-height: 550px;
+    margin-top: 90px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 40px;
+}
+
+/* Categories container */
+.categories-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px; /* Increased gap between fields */
+    margin-top: 20px; /* Adjust the top margin as needed */
+}
+
+.categories-container input[type="text"] {
+    width: calc(33.33% - 10px); /* Adjust the width of each field */
+    padding: 12px; /* Adjust the padding as needed */
+    margin-bottom: 15px; /* Increased margin-bottom */
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+.category {
+    background-color: #FF4500;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.category:hover {
+    background-color: #cc4c34;
+}
+
+/* Navbar styles */
+.navbar {
+    background-color: #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.logo {
+    text-decoration: none;
+    color: #fff;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.logo:hover {
+    color: #FF4500;
+}
+
+.nav-links {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-links li {
+    margin-left: 20px;
+    white-space: nowrap;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #FF6347;
+}
+
+/* Form styles */
+.input-field {
+    width: 100%; /* Adjust as needed */
+    padding: 10px;
+    margin-bottom: 15px; /* Increased margin */
+}
+
+.button {
+    background-color: #000000;
+    color: #fff;
+    font-family: 'SunnySpells-Regular', sans-serif;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 18px;
+    width: auto;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.button:hover {
+    background-color: #FF4500;
+}
