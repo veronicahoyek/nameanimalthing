@@ -36,7 +36,7 @@ const client = new MongoClient(uri);
 
 db = client.db("nameanimalthing");
 
-app.get("/", (req, res) => {
+app.get("/home", (req, res) => {
   res.sendFile(__dirname + "/html/index.html");
 });
 
@@ -292,6 +292,7 @@ app.post("/joinroom", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 app.get("/waitingroom", (req, res) => {
   if (!req.session.user) {
     res.redirect("/signin");
@@ -310,6 +311,10 @@ app.get("/api/waitingroom", async (req, res) => {
   }
 
   res.json(game);
+=======
+app.get("/howtoplay", (req, res) => {
+  res.sendFile(__dirname + "/html/howtoplay.html");
+>>>>>>> 29f045f4e63ce67181cb3c817cf15de354d23d5d
 });
 
 app.listen(3001, () => {

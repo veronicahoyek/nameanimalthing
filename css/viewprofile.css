@@ -63,6 +63,7 @@ body {
     color: #FF6347;
     font-size: 24px;
     transition: color 0.3s ease;
+    margin-left: 20px;
 }
 
 .logo:hover {
