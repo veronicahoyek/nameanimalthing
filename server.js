@@ -131,7 +131,15 @@ app.get("/api/user", async (req, res) => {
   res.json(user);
 });
 
-// Endpoint to handle contact form submission
+app.get("/contact", (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  res.sendFile(__dirname + "/html/contactus.html");
+});
+
 app.post("/contact", async (req, res) => {
   const { username, email, message } = req.body;
 
@@ -162,7 +170,6 @@ app.post("/contact", async (req, res) => {
     });
   }
 });
-
 
 app.put("/api/user", async (req, res) => {
   if (!req.session.user) {
