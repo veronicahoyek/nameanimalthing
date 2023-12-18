@@ -133,12 +133,12 @@ app.get("/api/user", async (req, res) => {
 
 // Endpoint to handle contact form submission
 app.post("/contact", async (req, res) => {
-  const { name, email, message } = req.body;
+  const { username, email, message } = req.body;
 
   try {
     // Assuming you have a collection named "contactMessages"
     const result = await db.collection("contactMessages").insertOne({
-      name,
+      username,
       email,
       message,
     });

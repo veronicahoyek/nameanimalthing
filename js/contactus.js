@@ -1,9 +1,9 @@
 fetch("/api/user")
     .then((response) => response.json())
     .then((user) => {
-        document.getElementById("name").value = user.username;
+        document.getElementById("username").value = user.username;
         document.getElementById("email").value = user.email;
-        document.getElementById("name").disabled = true;
+        document.getElementById("username").disabled = true;
         document.getElementById("email").disabled = true;
     })
     .catch((error) => console.error("Error:", error));
@@ -11,7 +11,7 @@ fetch("/api/user")
 document.querySelector(".contact-us-form").addEventListener("submit", function (event) {
     event.preventDefault();
 
-    let name = document.getElementById("name").value;
+    let username = document.getElementById("username").value;
     let email = document.getElementById("email").value;
     let message = document.getElementById("message").value;
 
@@ -21,7 +21,7 @@ document.querySelector(".contact-us-form").addEventListener("submit", function (
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            name: name,
+            username: username,
             email: email,
             message: message,
         }),
