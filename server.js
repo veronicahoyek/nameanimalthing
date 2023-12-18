@@ -292,7 +292,6 @@ app.post("/joinroom", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 app.get("/waitingroom", (req, res) => {
   if (!req.session.user) {
     res.redirect("/signin");
@@ -310,13 +309,11 @@ app.get("/api/waitingroom", async (req, res) => {
     return;
   }
 
-  res.json(game);
-=======
-app.get("/howtoplay", (req, res) => {
-  res.sendFile(__dirname + "/html/howtoplay.html");
->>>>>>> 29f045f4e63ce67181cb3c817cf15de354d23d5d
-});
+  const isCreator =
+    req.session.user._id.toString() === game.players[0]._id.toString();
 
+  res.json({ game, isCreator });
+});
 app.listen(3001, () => {
   console.log("Server is running at port 3001");
 });
