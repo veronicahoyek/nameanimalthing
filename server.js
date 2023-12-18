@@ -182,6 +182,16 @@ app.put("/api/user", async (req, res) => {
     updateFields[key] = req.body[key];
   }
 
+  if (updateFields.email) {
+    const existingUser = await db
+      .collection("users")
+      .findOne({ email: updateFields.email });
+    if (existingUser) {
+      res.status(400).json({ message: "Email already in use" });
+      return;
+    }
+  }
+
   const updateResult = await db
     .collection("users")
     .updateOne({ email: req.session.user.email }, { $set: updateFields });
@@ -192,8 +202,6 @@ app.put("/api/user", async (req, res) => {
     res.status(500).json({ message: "Error updating user" });
   }
 });
-
-// ... rest of your code ...
 
 let games = {}; // Temporary storage for games. Replace with actual database.
 
