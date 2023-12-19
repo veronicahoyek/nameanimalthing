@@ -90,3 +90,14 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Error fetching results: " + error);
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const dashboardURL = "/dashboard";
+
+  const dashboardButton = document.getElementById('dashboardButton');
+  if (dashboardButton) {
+      dashboardButton.addEventListener('click', function() {
+          window.location.href = dashboardURL;
+      });
+  }
+});

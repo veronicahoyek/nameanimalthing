@@ -146,7 +146,7 @@ textarea {
     margin-bottom: 10px;
 }
 
-button[type="submit"] {
+#dashboardButton {
     background-color: #000000;
     color: #fff;
     font-family: 'SunnySpells-Regular', sans-serif;
@@ -163,7 +163,7 @@ button[type="submit"] {
     display: block;
 }
 
-button[type="submit"]:hover {
+#dashboardButton:hover {
     background-color: #FF4500;
 }
 
