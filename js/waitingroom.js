@@ -5,12 +5,15 @@ const roomCode = urlParams.get("roomCode");
 socket.emit("joinRoom", roomCode);
 
 socket.on("playerJoined", (player) => {
+  console.log(player);
   const userAvatarDiv = document.createElement("div");
   userAvatarDiv.className = "user-avatar";
 
   const img = document.createElement("img");
-  img.src = "../ressources/pfp.png";
+  console.log(player.avatar);
+  img.src = player.avatar;
   img.alt = `User Avatar ${player.username}`;
+  console.log(player.username);
 
   const p = document.createElement("p");
   p.textContent = player.username;
@@ -32,7 +35,7 @@ window.addEventListener("load", async () => {
     userAvatarDiv.className = "user-avatar";
 
     const img = document.createElement("img");
-    img.src = "../ressources/pfp.png";
+    img.src = player.avatar;
     img.alt = `User Avatar ${player.username}`;
 
     const p = document.createElement("p");

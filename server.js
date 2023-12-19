@@ -217,6 +217,7 @@ app.post("/creategame", async (req, res) => {
   const creator = {
     _id: req.session.user._id,
     username: req.session.user.username,
+    avatar: req.session.user.avatar,
   };
 
   const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -281,6 +282,7 @@ app.post("/joinroom", async (req, res) => {
     _id: req.session.user._id,
     username: req.session.user.username,
     score: 0,
+    avatar: req.session.user.avatar,
   };
 
   const result = await db
@@ -422,8 +424,6 @@ app.get("/signout", (req, res) => {
 
 app.post("/api/submitanswers", async (req, res) => {
   const { roomCode, answers } = req.body;
-  console.log(answers);
-  console.log(roomCode);
 
   const game = await db.collection("games").findOne({ roomCode });
   if (!game) {
@@ -442,6 +442,7 @@ app.post("/api/submitanswers", async (req, res) => {
           "rounds.$[round].playerResponses": {
             player: req.session.user.username,
             answers,
+            gradesSubmitted: false, // Initialize gradesSubmitted to false
           },
         },
       },
@@ -508,6 +509,8 @@ app.get("/game", (req, res) => {
   res.sendFile(__dirname + "/html/game.html");
 });
 
+let nb = 0;
+
 app.post("/api/submitgrades", async (req, res) => {
   const { roomCode, grades } = req.body;
 
@@ -529,6 +532,17 @@ app.post("/api/submitgrades", async (req, res) => {
   const nextUserIndex = (currentUserIndex + 1) % round.playerResponses.length;
   const nextUser = round.playerResponses[nextUserIndex].player;
 
+  const playerResponse = round.playerResponses.find(
+    (response) => response.player === nextUser
+  );
+  if (playerResponse && playerResponse.gradesSubmitted) {
+    res.json({
+      success: false,
+      message: "You have already submitted grades for this round",
+    });
+    return;
+  }
+
   const result = await db.collection("games").updateOne(
     { roomCode, "rounds.roundNumber": round.roundNumber },
     {
@@ -538,6 +552,9 @@ app.post("/api/submitgrades", async (req, res) => {
           grades,
         },
       },
+      $set: {
+        "rounds.$.playerResponses.$[playerResponse].gradesSubmitted": true,
+      },
     },
     {
       arrayFilters: [{ "playerResponse.player": nextUser }],
@@ -545,9 +562,84 @@ app.post("/api/submitgrades", async (req, res) => {
   );
 
   if (result.modifiedCount === 1) {
+    nb++;
+
+    if (nb === 2) {
+      nb = 0;
+      io.emit("nextRound");
+    }
+
     res.json({ success: true });
   } else {
     res.json({ success: false, message: "Error submitting grades" });
+  }
+});
+
+app.get("/results", async (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  const { roomCode } = req.query;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.redirect("/dashboard");
+    return;
+  }
+
+  res.sendFile(__dirname + "/html/results.html");
+});
+
+app.get("/api/getresults", async (req, res) => {
+  const { roomCode } = req.query;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.json({ success: false, message: "Game does not exist" });
+    return;
+  }
+
+  const round = game.rounds.find((round) => round.status === "active");
+  if (!round) {
+    res.json({ success: false, message: "No active round" });
+    return;
+  }
+
+  const playerResponses = round.playerResponses.map((response) => {
+    return {
+      player: response.player,
+      totalGrade: response.grades[0],
+    };
+  });
+  res.json({ success: true, playerResponses });
+});
+
+app.put("/api/updateuser", async (req, res) => {
+  if (!req.session.user) {
+    res.status(401).json({ message: "Not authenticated" });
+    return;
+  }
+
+  const { won, username } = req.body;
+
+  const updateFields = {
+    $inc: { gamesPlayed: 1 },
+  };
+
+  if (won) {
+    updateFields.$inc.gamesWon = 1;
+  }
+
+  const updateResult = await db
+    .collection("users")
+    .updateOne({ username: username }, updateFields);
+
+  if (updateResult.modifiedCount === 1) {
+    res.json({ success: true, message: "User updated successfully" });
+  } else {
+    res.status(500).json({ message: "Error updating user" });
   }
 });
 

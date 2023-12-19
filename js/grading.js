@@ -1,4 +1,5 @@
-// grades.js
+const socket = io();
+
 const urlParams = new URLSearchParams(window.location.search);
 const roomCode = urlParams.get("roomCode");
 
@@ -57,12 +58,14 @@ window.addEventListener("load", async () => {
 });
 
 async function submitGrades() {
-  const grades = Array.from(document.querySelectorAll("select")).map(
-    (select) => ({
+  console.log("submitGrades called"); // Add this line
+
+  const grades = Array.from(document.querySelectorAll("select"))
+    .filter((select) => !select.disabled)
+    .map((select) => ({
       category: select.name.split("Grade")[0],
       grade: select.value,
-    })
-  );
+    }));
 
   const response = await fetch("/api/submitgrades", {
     method: "POST",
@@ -75,12 +78,18 @@ async function submitGrades() {
   const data = await response.json();
   if (data.success) {
     console.log("Grades submitted successfully");
+    socket.emit("gradesSubmitted", { roomCode });
   } else {
     console.error("Failed to submit grades");
   }
 }
 
-// Call submitGrades when the user submits the grades
 document
-  .querySelector("#submitGradesButton")
+  .getElementById("submitGradesButton")
   .addEventListener("click", submitGrades);
+
+socket.on("nextRound", () => {
+  // Redirect to the next round
+  console.log("nextRound called"); // Add this line
+  window.location.href = `/results?roomCode=${roomCode}`;
+});
