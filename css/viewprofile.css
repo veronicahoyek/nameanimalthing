@@ -176,3 +176,30 @@ body {
 .edit-button:hover {
     background-color: #FF4500;
 }
+
+.avatar-selection {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 10;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 5px;
+}
+
+.avatar.selected {
+    border-color: #FF6347;
+}

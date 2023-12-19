@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <title>Game</title>
     <link rel="stylesheet" href="../css/game.css">
-    <!-- Include other stylesheets or libraries if needed -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body style="background-image: url('../ressources/background.jpg'); background-size: cover; background-position: center;">
-    <!-- Navigation -->
+
     <nav class="navbar">
         <a href="dashboard" class="logo">Name, Animal, Thing</a>
         <ul class="nav-links">
@@ -19,22 +18,20 @@
         </ul>
     </nav>
 
-    <!-- Game Content -->
-    <div class="background-overlay">
-        <div class="game-container">
-            <h2 id="roomCode">Game Room</h2>
-            <h3 id="letter"></h3>
+<div class="background-overlay">
+    <div class="game-container">
+        <h2 id="roomCode">Game Room</h2>
+        <h3 id="letter"></h3>
+        <form id="gameForm">
             <div class="categories-container" id="categoriesContainer">
                 <div id="categories"></div>
             </div>
-            <!-- Submit Button -->
-            <form id="gameForm">
-                <div class="form-group">
-                    <button type="submit" class="button">Submit</button>
-                </div>
-            </form>
-        </div>
+            <div class="form-group">
+                <button type="submit" class="button">Submit</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="../js/game.js"></script>

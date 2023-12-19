@@ -66,7 +66,7 @@ document.querySelector(".button").addEventListener("click", () => {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        window.location.href = `/game.html?roomCode=${roomCode}`;
+        window.location.href = data.redirect;
       } else {
         console.error("Failed to start game");
       }
@@ -74,5 +74,5 @@ document.querySelector(".button").addEventListener("click", () => {
 });
 
 socket.on("gameStarted", () => {
-  window.location.href = `/game.html?roomCode=${roomCode}`;
+  window.location.href = `/game?roomCode=${roomCode}`;
 });

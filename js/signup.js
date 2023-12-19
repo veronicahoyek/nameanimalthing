@@ -17,6 +17,15 @@ function isStrongPassword(password) {
   return "";
 }
 
+document.querySelectorAll(".avatar").forEach((avatar) => {
+  avatar.addEventListener("click", function () {
+    document
+      .querySelectorAll(".avatar")
+      .forEach((av) => av.classList.remove("selected"));
+    this.classList.add("selected");
+  });
+});
+
 document
   .getElementById("signup-form")
   .addEventListener("submit", function (event) {
@@ -40,6 +49,9 @@ document
       return;
     }
 
+    let selectedAvatar = document.querySelector(".avatar.selected");
+    let avatar = selectedAvatar ? selectedAvatar.getAttribute("src") : null;
+
     fetch("/signup", {
       method: "POST",
       headers: {
@@ -49,6 +61,7 @@ document
         username: username,
         email: email,
         password: password,
+        avatar: avatar,
       }),
     })
       .then((response) => response.json())

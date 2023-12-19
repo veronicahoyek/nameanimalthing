@@ -1,13 +1,15 @@
-// game.js
 const socket = io();
-const urlParams = new URLSearchParams(window.location.search);
-const roomCode = urlParams.get("roomCode");
 
-socket.emit("joinRoom", roomCode);
+document.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomCode = urlParams.get("roomCode");
 
-window.addEventListener("load", async () => {
-  const response = await fetch(`/api/waitingroom?roomCode=${roomCode}`);
+  console.log("Joining room", roomCode);
+  socket.emit("joinRoom", roomCode);
+
+  const response = await fetch(`/api/roominfo?roomCode=${roomCode}`);
   const data = await response.json();
+  console.log(data);
 
   document.querySelector(
     "#roomCode"
@@ -34,32 +36,32 @@ window.addEventListener("load", async () => {
 
     document.querySelector("#categories").appendChild(div);
   });
-});
 
-document.querySelector("#gameForm").addEventListener("submit", (event) => {
-  event.preventDefault();
+  const submitForm = async (event) => {
+    if (event) event.preventDefault();
 
-  const formData = new FormData(event.target);
-  const answers = Object.fromEntries(formData.entries());
+    const formData = new FormData(document.querySelector("#gameForm"));
+    const answers = Object.fromEntries(formData.entries());
 
-  fetch("/api/submitanswers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ roomCode, answers }),
-    credentials: "include",
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        // Handle success (e.g. show a message, wait for next round, etc.)
-      } else {
-        console.error("Failed to submit answers");
-      }
-    });
-});
+    fetch("/api/submitanswers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ roomCode, answers }),
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          window.location.href = `/grading?roomCode=${roomCode}`;
+        } else {
+          console.error("Failed to submit answers");
+        }
+      });
+  };
 
-socket.on("nextRound", (data) => {
-  // Handle the start of the next round (e.g. update the letter, clear the form, etc.)
+  document.querySelector("#gameForm").addEventListener("submit", submitForm);
+
+  socket.on("submitForm", submitForm);
 });

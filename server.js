@@ -11,12 +11,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-io.on("connection", (socket) => {
-  socket.on("joinRoom", (roomCode) => {
-    socket.join(roomCode);
-  });
-});
-
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,7 +45,7 @@ app.get("/signup", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, avatar } = req.body;
 
   const user = await db.collection("users").findOne({ email });
   if (user) {
@@ -61,7 +55,7 @@ app.post("/signup", async (req, res) => {
 
   const result = await db
     .collection("users")
-    .insertOne({ username, email, password });
+    .insertOne({ username, email, password, avatar: avatar });
   if (result.acknowledged) {
     res.json({
       success: true,
@@ -254,6 +248,12 @@ app.post("/creategame", async (req, res) => {
   }
 });
 
+io.on("connection", (socket) => {
+  socket.on("joinRoom", (roomCode) => {
+    socket.join(roomCode);
+  });
+});
+
 app.get("/joinroom", (req, res) => {
   if (!req.session.user) {
     res.redirect("/signin");
@@ -320,6 +320,17 @@ app.get("/api/waitingroom", async (req, res) => {
     req.session.user._id.toString() === game.players[0]._id.toString();
 
   res.json({ game, isCreator });
+});
+
+app.get("/api/roominfo", async (req, res) => {
+  const { roomCode } = req.query;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.status(404).json({ message: "Room not found" });
+    return;
+  }
+  res.json({ game });
 });
 
 app.get("/howtoplay", (req, res) => {
@@ -391,7 +402,7 @@ app.post("/api/startgame", async (req, res) => {
       letter,
       categories: game.categories,
     });
-    res.json({ success: true });
+    res.redirect(`/game?roomCode=${roomCode}`);
   } else {
     res.json({ success: false, message: "Error starting game" });
   }
@@ -401,13 +412,143 @@ app.get("/signout", (req, res) => {
   console.log(req.session);
   req.session.destroy((err) => {
     if (err) {
-      // Handle the error case
       res.status(500).send("Could not sign out. Please try again.");
     } else {
       res.redirect("/home");
-      console.log(req.session); // Redirect to home page after signing out
+      console.log(req.session);
     }
   });
+});
+
+app.post("/api/submitanswers", async (req, res) => {
+  const { roomCode, answers } = req.body;
+  console.log(answers);
+  console.log(roomCode);
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.json({ success: false, message: "Game does not exist" });
+    return;
+  }
+
+  try {
+    const result = await db.collection("games").updateOne(
+      {
+        roomCode,
+        "rounds.playerResponses.player": { $ne: req.session.user.username },
+      },
+      {
+        $push: {
+          "rounds.$[round].playerResponses": {
+            player: req.session.user.username,
+            answers,
+          },
+        },
+      },
+      {
+        arrayFilters: [{ "round.roundNumber": game.currentRound }],
+      }
+    );
+
+    if (result.modifiedCount === 1) {
+      console.log("Submitted answers");
+      io.in(roomCode).emit("submitForm");
+      res.json({ success: true });
+    } else {
+      console.log("Failed to submit answers");
+      res.json({ success: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
+  }
+});
+
+app.get("/api/getanswers", async (req, res) => {
+  const { roomCode } = req.query;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.json({ success: false, message: "Game does not exist" });
+    return;
+  }
+
+  const round = game.rounds.find((round) => round.status === "active");
+  if (!round) {
+    res.json({ success: false, message: "No active round" });
+    return;
+  }
+
+  const currentUserIndex = round.playerResponses.findIndex(
+    (response) => response.player === req.session.user.username
+  );
+  const nextUserIndex = (currentUserIndex + 1) % round.playerResponses.length;
+
+  res.json({
+    success: true,
+    playerResponses: round.playerResponses,
+    gradingIndex: nextUserIndex,
+  });
+});
+
+app.get("/grading", (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+
+    return;
+  }
+  res.sendFile(__dirname + "/html/grading.html");
+});
+
+app.get("/game", (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/signin");
+    return;
+  }
+  res.sendFile(__dirname + "/html/game.html");
+});
+
+app.post("/api/submitgrades", async (req, res) => {
+  const { roomCode, grades } = req.body;
+
+  const game = await db.collection("games").findOne({ roomCode });
+  if (!game) {
+    res.json({ success: false, message: "Game does not exist" });
+    return;
+  }
+
+  const round = game.rounds.find((round) => round.status === "active");
+  if (!round) {
+    res.json({ success: false, message: "No active round" });
+    return;
+  }
+
+  const currentUserIndex = round.playerResponses.findIndex(
+    (response) => response.player === req.session.user.username
+  );
+  const nextUserIndex = (currentUserIndex + 1) % round.playerResponses.length;
+  const nextUser = round.playerResponses[nextUserIndex].player;
+
+  const result = await db.collection("games").updateOne(
+    { roomCode, "rounds.roundNumber": round.roundNumber },
+    {
+      $push: {
+        "rounds.$.playerResponses.$[playerResponse].grades": {
+          grader: req.session.user.username,
+          grades,
+        },
+      },
+    },
+    {
+      arrayFilters: [{ "playerResponse.player": nextUser }],
+    }
+  );
+
+  if (result.modifiedCount === 1) {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false, message: "Error submitting grades" });
+  }
 });
 
 server.listen(3001, () => {
