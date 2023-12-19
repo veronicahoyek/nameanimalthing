@@ -32,9 +32,10 @@ fetch("/api/user")
       originalAvatar || "../ressources/pfp.png";
     document.getElementById("games-played").innerText = user.gamesPlayed || 0;
     document.getElementById("games-won").innerText = user.gamesWon || 0;
-    document.getElementById("games-lost").innerText = user.gamesLost || 0;
+    document.getElementById("games-lost").innerText =
+      user.gamesPlayed - user.gamesWon || 0;
     document.getElementById("winning-percentage").innerText =
-      user.winningPercentage || "0%";
+      (user.gamesWon / user.gamesPlayed) * 100 || "0%";
   })
   .catch((error) => console.error("Error:", error));
 

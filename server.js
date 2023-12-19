@@ -608,8 +608,12 @@ app.get("/api/getresults", async (req, res) => {
   }
 
   const playerResponses = round.playerResponses.map((response) => {
+    const player = game.players.find(
+      (player) => player.username === response.player
+    );
     return {
       player: response.player,
+      avatar: player.avatar,
       totalGrade: response.grades[0],
     };
   });

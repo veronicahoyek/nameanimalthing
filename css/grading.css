@@ -161,7 +161,7 @@ h2 {
     font-size: 12px;
 }
 
-.button {
+#submitGradesButton {
     background-color: #000000;
     color: #fff;
     font-family: 'SunnySpells-Regular', sans-serif;
@@ -175,6 +175,6 @@ h2 {
     margin-top: 20px;
 }
 
-.button:hover {
+#submitGradesButton:hover {
     background-color: #FF4500;
 }

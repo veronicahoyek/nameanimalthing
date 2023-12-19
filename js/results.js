@@ -15,6 +15,19 @@ document.addEventListener("DOMContentLoaded", () => {
         // Clear the container
         container.innerHTML = "";
 
+        // Find the player with the highest sum of grades
+        let highestSum = 0;
+        playerResponses.forEach((response) => {
+          const grades = response.totalGrade.grades;
+          let sum = 0;
+          grades.forEach((grade) => {
+            sum += parseInt(grade.grade);
+          });
+          if (sum > highestSum) {
+            highestSum = sum;
+          }
+        });
+
         // Loop through the playerResponses and create HTML elements to display the data
         playerResponses.forEach((response) => {
           const playerElement = document.createElement("div");
@@ -23,6 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const playerNameElement = document.createElement("span");
           playerNameElement.classList.add("player-name");
           playerNameElement.textContent = response.player;
+
+          const avatarElement = document.createElement("img");
+          avatarElement.classList.add("player-avatar");
+          avatarElement.src = response.avatar;
 
           const totalGradeElement = document.createElement("span");
           totalGradeElement.classList.add("total-grade");
@@ -36,41 +53,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
           totalGradeElement.textContent = sum;
 
-          // Append the playerNameElement and totalGradeElement to the playerElement
+          // Append the playerNameElement, avatarElement, and totalGradeElement to the playerElement
           playerElement.appendChild(playerNameElement);
+          playerElement.appendChild(avatarElement);
           playerElement.appendChild(totalGradeElement);
 
           // Append the playerElement to the container
           container.appendChild(playerElement);
 
-          // Check if the current player is the user and if they won the game
-          if (response.player === "username" && sum > 0) {
-            // Update the user's information
-            fetch("/api/updateuser", {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ won: true }),
+          // Update the player's information based on the highest sum of grades
+          fetch("/api/updateuser", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: response.player,
+              won: sum === highestSum,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                console.log("User updated successfully");
+              } else {
+                console.log("Error updating user: " + data.message);
+              }
             })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.success) {
-                  console.log("User updated successfully");
-                } else {
-                  console.log("Error updating user: " + data.message);
-                }
-              })
-              .catch((error) => {
-                console.log("Error updating user: " + error);
-              });
-          }
+            .catch((error) => {
+              console.log("Error updating user: " + error);
+            });
         });
-      } else {
-        console.log("Error: " + data.message);
       }
     })
     .catch((error) => {
-      console.log("Error: " + error);
+      console.log("Error fetching results: " + error);
     });
 });
