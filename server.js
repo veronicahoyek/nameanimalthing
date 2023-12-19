@@ -89,7 +89,6 @@ app.post("/signin", async (req, res) => {
   const userSession = { ...user };
 
   req.session.user = userSession;
-
   res.json({
     success: true,
     message: "User signed in successfully",
@@ -181,24 +180,32 @@ app.put("/api/user", async (req, res) => {
     updateFields[key] = req.body[key];
   }
 
-  if (updateFields.email) {
-    const existingUser = await db
-      .collection("users")
-      .findOne({ email: updateFields.email });
+  const email = req.session.user.email;
+
+  // Check if the email is being updated and if it already exists in the database
+  if (updateFields.email && updateFields.email !== email) {
+    const existingUser = await db.collection("users").findOne({ email: updateFields.email });
     if (existingUser) {
       res.status(400).json({ message: "Email already in use" });
       return;
     }
   }
 
-  const updateResult = await db
-    .collection("users")
-    .updateOne({ email: req.session.user.email }, { $set: updateFields });
+  try {
+    const updateResult = await db.collection("users").updateOne({ email }, { $set: updateFields });
 
-  if (updateResult.modifiedCount === 1) {
-    res.json({ success: true, message: "User updated successfully" });
-  } else {
-    res.status(500).json({ message: "Error updating user" });
+    if (updateResult.modifiedCount === 1) {
+      // Update the user session if avatar is updated
+      if (updateFields.avatar) {
+        req.session.user.avatar = updateFields.avatar;
+      }
+
+      res.json({ success: true, message: "User updated successfully" });
+    } else {
+      res.status(500).json({ message: "Error updating user" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error: error });
   }
 });
 
